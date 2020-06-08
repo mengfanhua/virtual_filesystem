@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+/filesystem/.vs/filesystem/v14/.suo
+/filesystem/filesystem/filesystem.vcxproj
+/filesystem/filesystem/filesystem.vcxproj.filters
+/filesystem/filesystem.sln
+/filesystem/filesystem.VC.db
+/filesystem/filesystem.VC.VC.opendb
