@@ -36,3 +36,9 @@
 /filesystem/filesystem.sln
 /filesystem/filesystem.VC.db
 /filesystem/filesystem.VC.VC.opendb
+/filesystem/filesystem/Debug/filesystem.tlog
+/filesystem/filesystem/Debug
+/filesystem/filesystem/x64/Debug/filesystem.tlog
+/filesystem/filesystem/x64/Debug
+/filesystem/x64/Debug
+/filesystem/Debug
