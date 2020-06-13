@@ -34,7 +34,6 @@ int format() {
 		superblock.inode_point[i] = MAX_INODE_NUM - i - 1;
 	}
 	superblock.free_inode[MAX_INODE_NUM - 1] = 1;
-	superblock.max_free_index = MAX_INODE_NUM - 2;
 
 	superblock.data_num = MAX_DATA_NUM;
 	superblock.free_data_num = MAX_DATA_NUM - 1;
@@ -110,4 +109,32 @@ int init() {
 	strcpy(id, "");
 	flag = 1;
 	return flag;
+}
+
+void exit_sys() {
+	if (superblock.dirty == 1) {//超级块有过更改
+		superblock.dirty = 0;
+		fseek(fp, SUPER_START, SEEK_SET);
+		fwrite(&superblock, 1, sizeof(struct superblock), fp);
+	}
+	int i;
+	struct inode *p, *t;
+	for (i = 0; i < HASH_SIZE; i++) {
+		p = hash_head[i].next;
+		while (p != NULL) {
+			if (p->dirty == 1) {//对每个修改过的i节点进行存储
+				fseek(fp, INODE_START+INODE_SIZE*p->index, SEEK_SET);
+				fwrite(&p->disk_block, 1, sizeof(struct dinode), fp);
+			}
+			t = p;
+			p = p->next;
+		}
+	}
+	int j;
+	for (j = 0; j < MAX_DIR_NUM; j++) {//对目录进行存储
+		fseek(fp, DIR_START + DIR_SIZE*j, SEEK_SET);
+		fwrite(&dir[j], 1, sizeof(struct dir), fp);
+	}
+	p = NULL;
+	t = NULL;
 }
