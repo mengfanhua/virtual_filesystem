@@ -24,7 +24,10 @@
 #define DIR_START (SUPER_BLOCK + INODE_BLOCK) * BLOCK_SIZE
 #define DATA_START (SUPER_BLOCK + INODE_BLOCK + DIR_BLOCK) * BLOCK_SIZE
 
-#define MAX_SYSTEM_OPEN 50   //系统打开表
+#define MAX_SYSTEM_OPEN 40   //系统打开表最大值
+#define MAX_USER_OPEN 10     //用户打开表最大值
+#define USER_NUM 8           //最大用户数
+#define MAX_USER_EXIST_NUM 5 //最多同时登录用户数
 
 
 struct superblock {
@@ -44,8 +47,8 @@ struct superblock {
 
 	//**********用户控制部分***********
 	unsigned short usernum;
-	char uid[8][6];
-	char passwd[8][6];
+	char uid[USER_NUM][6];
+	char passwd[USER_NUM][6];
 };
 
 struct dir {
@@ -56,7 +59,7 @@ struct dir {
 
 struct dinode {
 	unsigned int connect_num;
-	unsigned short rw_mode;//1为读，2为写，3为执行
+	unsigned short rw_mode;//前8位控制读写，001，010，100为读写执行；后八位控制8个用户的权限，全部权限为0x777
 	char uid[6];
 	unsigned short filesize;
 	char file_type[MAX_FILE_NUM];//1为目录，0为文件
@@ -75,7 +78,6 @@ struct hinode {
 };
 
 struct system_open {
-	unsigned short mode;
 	unsigned int count;
 	struct inode *inode;
 };
@@ -88,5 +90,36 @@ extern struct dir dir[MAX_DIR_NUM];
 extern struct hinode hash_head[HASH_SIZE];
 extern struct system_open sys_open[MAX_SYSTEM_OPEN];
 extern char uid[6];//用来登陆后记录当前用户的uid的
+
+//**********bottom_function**********
+struct user_open {
+	char uid[6];
+	unsigned short opensize;//已打开个数
+	unsigned int useropen[MAX_USER_OPEN];//保存系统打开表的索引
+	struct user_open *next;
+};
+
+struct cur_path {
+	struct cur_path *front;
+	struct cur_path *next;
+	int inum;//用于记录i节点值
+};
+
+struct user_head {
+	unsigned short num;
+	struct user_open *next;
+};
+extern struct user_head uhead;
+extern struct cur_path curpath;
+extern char id[6];
+
+int login(char* uid, char* passwd);//登录
+void logout();//登出，会关闭已打开得出文件
+int signup(char* uid, char* passwd);//注册用户
+void exchange_admin();//切换账户，不会关闭当前用户已打开的文件
+
+//***********文件操作方法**********
+void close(int sysopen_index);
+
 
 #endif // VIRTUAL_SYSTEM_H

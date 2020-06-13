@@ -2,11 +2,14 @@
 #include <malloc.h>
 #include <string.h>
 
-FILE *fp;
+FILE *fp = NULL;
 struct superblock superblock;
 struct dir dir[MAX_DIR_NUM];
 struct hinode hash_head[HASH_SIZE];
 struct system_open sys_open[MAX_SYSTEM_OPEN];
+struct user_head uhead;
+struct cur_path curpath;
+char id[6];
 
 int format() {
 	int flag = 0;
@@ -50,7 +53,7 @@ int format() {
 	//**********开始写根目录i节点**********
 	struct dinode dinode;
 	dinode.connect_num = 1;
-	dinode.rw_mode = 1;
+	dinode.rw_mode = 0x777;//所有用户全部控制权限
 	strcpy(dinode.uid, superblock.uid[0]);
 	dinode.filesize = 0;
 	dinode.file_type[0] = 1;
@@ -94,9 +97,17 @@ int init() {
 	//**********初始化系统文件打开表**********
 	for (i = 0; i < MAX_SYSTEM_OPEN; i++) {
 		sys_open[i].count = 0;
-		sys_open[i].mode = 1;
 		sys_open[i].inode = NULL;
 	}
+	//**********初始化用户打开表链表头**********
+	uhead.next = NULL;
+	uhead.num = 0;
+	//**********初始化当前路径**********
+	curpath.inum = -1;
+	curpath.front = &curpath;
+	curpath.next = &curpath;
+	//**********初始化当前用户名**********
+	strcpy(id, "");
 	flag = 1;
 	return flag;
 }
