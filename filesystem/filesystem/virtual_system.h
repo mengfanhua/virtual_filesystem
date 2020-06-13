@@ -36,7 +36,6 @@ struct superblock {
 	unsigned short free_inode_num;
 	char free_inode[MAX_INODE_NUM];
 	unsigned int inode_point[MAX_INODE_NUM];
-	unsigned short max_free_index;
 
 	//**********数据区控制部分**********
 	unsigned int data_num;
@@ -68,6 +67,7 @@ struct dinode {
 
 struct inode {
 	struct dinode disk_block;
+	unsigned int index;
 	struct inode *front;
 	struct inode *next;
 	char dirty;
@@ -84,6 +84,7 @@ struct system_open {
 
 int format();
 int init();
+void exit_sys();
 extern FILE *fp;
 extern struct superblock superblock;
 extern struct dir dir[MAX_DIR_NUM];
@@ -91,7 +92,7 @@ extern struct hinode hash_head[HASH_SIZE];
 extern struct system_open sys_open[MAX_SYSTEM_OPEN];
 extern char uid[6];//用来登陆后记录当前用户的uid的
 
-//**********bottom_function**********
+//**********log**********
 struct user_open {
 	char uid[6];
 	unsigned short opensize;//已打开个数
@@ -120,6 +121,27 @@ void exchange_admin();//切换账户，不会关闭当前用户已打开的文件
 
 //***********文件操作方法**********
 void close(int sysopen_index);
+char* open(int inode_index);
+int save(int inode, char * content);
+char* _open(int inode_index);
+
+//**********文件操作与底层接口函数**********
+char* read(int dnode_index);
+void write(int dnode_index, char* content);
+struct inode* iget(int inode_index);
+void iput(int inode_index);
+int ialloc();
+void ifree(int inode_index);
+int balloc();
+void bfree(int data_index);
+
+//**********文件夹及文件操作方法**********
+int mkdir(int inode_index);
+int chdir(int inode_index, int new_inode_index);
+int create(int inode_index);
+void del(int inode_index);
+int fast(int inode_index, int new_inode_index);
+
 
 
 #endif // VIRTUAL_SYSTEM_H
