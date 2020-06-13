@@ -126,6 +126,7 @@ int signup(char* uid, char* passwd) {
 			strcpy(superblock.uid[superblock.usernum], uid);
 			strcpy(superblock.passwd[superblock.usernum], passwd);
 			superblock.usernum += 1;
+			superblock.dirty = 1;
 			flag = 1;
 		}
 	}
