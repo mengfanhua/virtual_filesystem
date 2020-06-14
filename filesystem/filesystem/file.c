@@ -32,7 +32,6 @@ char* _open(int inode_index) {
 		}
 		free(r);
 	}
-	free(p);
 	p = NULL;
 	r = NULL;
 	return t;
@@ -169,7 +168,6 @@ int save(int inode, char* content) {
 		t = NULL;
 		flag = 1;
 	}
-	free(p);
 	p = NULL;
 	return flag;
 }
