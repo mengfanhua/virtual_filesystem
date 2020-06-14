@@ -42,3 +42,6 @@
 /filesystem/filesystem/x64/Debug
 /filesystem/x64/Debug
 /filesystem/Debug
+/filesystem/filesystem/Release/filesystem.tlog
+/filesystem/filesystem/Release
+/filesystem/Release
