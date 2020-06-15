@@ -2,10 +2,8 @@
 #include<string.h>
 
 int main() {
-	/*
-	printf("%zd\n",sizeof(struct superblock));
-	printf("%d", format());*/
-	char *a = "1";
-	printf("%zd",strlen(a));
+	unsigned int a = 0x77777777;
+	printf("%d\n",a);
+	printf("%d", format());
 	getchar();
 }
