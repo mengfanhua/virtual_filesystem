@@ -52,7 +52,7 @@ int format() {
 	//**********开始写根目录i节点**********
 	struct dinode dinode;
 	dinode.connect_num = 1;
-	dinode.rw_mode = 0x777;//所有用户全部控制权限
+	dinode.rw_mode = 0x77777777;//所有用户全部控制权限
 	strcpy(dinode.uid, superblock.uid[0]);
 	dinode.filesize = 0;
 	dinode.file_type[0] = 1;
