@@ -1,11 +1,33 @@
 #include "virtual_system.h"
+#include<string.h>
 
 struct superblock superblock;
 struct dir dir[MAX_DIR_NUM];
 char uid[6];
 
-int _cul_mode(int type) {//计算默认权限,0为文件，1为文件夹，二者默认权限不同
-
+unsigned int _cul_mode(int type) {//计算默认权限,0为文件，1为文件夹，二者默认权限不同
+	int i, j;
+	for (i = 0; i < superblock.usernum; i++) {
+		if (strcmp(superblock.uid[i], uid) == 0) {//找到当前用户的索引id
+			break;
+		}
+		else {
+			continue;
+		}
+	}
+	unsigned int flag;
+	if (type == 1) {//文件夹默认给读写权限
+		flag = 0x33333333;
+	}
+	else {//文件默认只给读权限
+		flag = 0x11111111;
+	}
+	unsigned int te = 0x7;
+	for (j = 0; j < i; j++) {
+		te = te * 16;//用户偏移为4位，所以乘16
+	}
+	flag = flag | te;//或运算将拥有者设置为所有权限
+	return flag;
 }
 
 int mkdir(int inode_index, char* dirname) {//创建文件夹
@@ -165,6 +187,30 @@ int share(int inode_index, int new_inode_index) {
 
 }
 
-int access(int allmode, int mode) {
-	
+int access(unsigned int allmode, int mode) {
+	int i, j, f;
+	unsigned int flag;
+	for (i = 0; i < superblock.usernum; i++) {
+		if (strcmp(superblock.uid[i], uid) == 0) {//找到当前用户的索引id
+			break;
+		}
+		else {
+			continue;
+		}
+	}
+	unsigned int te = 0x7;
+	for (j = 0; j < i; j++) {
+		te = te * 16;//用户偏移为4位，所以乘16
+	}
+	flag = allmode & te;//提取当前用户文件权限
+	for (j = 0; j < i; j++) {
+		flag = flag / 16;//反向操作，使权限指示置于最低位
+	}
+	if (flag & mode == 0) {//判断对应位是否为1
+		f = 0;
+	}
+	else {
+		f = 1;
+	}
+	return f;
 }
