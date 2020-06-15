@@ -57,8 +57,8 @@ struct dir {
 };
 
 struct dinode {
-	unsigned int connect_num;
-	unsigned short rw_mode;//前8位控制读写，001，010，100为读写执行；后八位控制8个用户的权限，全部权限为0x777
+	unsigned int rw_mode;//每四位为1个用户的读写权限，001，010，100为读写完全控制，用户顺序从低位到高位
+	unsigned short connect_num;
 	char uid[6];
 	unsigned short filesize;
 	char file_type[MAX_FILE_NUM];//1为目录，0为文件
@@ -139,9 +139,9 @@ void bfree(int data_index);
 int mkdir(int inode_index, char* dirname);
 int chdir(int inode_index, int new_inode_index);
 int create(int inode_index, char* dirname);
-void del(int inode_index, int index);
+int del(int inode_index, int index);
 int share(int inode_index, int new_inode_index);
-int access(int allmode, int mode);
+int access(unsigned int allmode, int mode);
 
 
 
