@@ -181,11 +181,14 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			iput(q->index);//释放内存i节点
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
+			p->dirty = 1;
 		}
 	}
 	else if (p->disk_block.file_type[index] == 3) {//删除快捷方式
 		p->disk_block.filesize -= 1;
 		p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
+		q->disk_block.connect_num -= 1;
+		q->dirty = 1;
 	}
 	else {
 		while (i < q->disk_block.filesize) {
@@ -204,6 +207,7 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			iput(q->index);//释放内存i节点
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
+			p->dirty = 1;
 		}
 	}
 	return flag;
