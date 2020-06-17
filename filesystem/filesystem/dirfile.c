@@ -63,6 +63,7 @@ int mkdir(int inode_index, char* dirname) {//创建文件夹
 			if (index != -1) {//空闲i节点存在
 				strcpy(dir[index].name, dirname);//置目录对应位
 				dir[index].index = index;//置目录对应指向
+				dir[index].front = p->index;
 				p->dirty = 1;//设置父目录为脏，使得关闭系统时写回磁盘
 				p->disk_block.filesize += 1;
 				p->disk_block.block_index[i] = index;
@@ -74,6 +75,7 @@ int mkdir(int inode_index, char* dirname) {//创建文件夹
 				p->disk_block.filesize = 0;
 				p->disk_block.rw_mode = _cul_mode(1);//计算权限值，默认只有拥有者全部权限
 				strcpy(p->disk_block.uid, uid);//标记拥有者
+				p->disk_block.connect_num = 1;
 				flag = 1;
 			}
 			else {//无空闲i节点
@@ -118,6 +120,7 @@ int create(int inode_index, char* dirname) {
 			if (index != -1) {//空闲i节点存在
 				strcpy(dir[index].name, dirname);//置目录对应位
 				dir[index].index = index;//置目录对应指向
+				dir[index].front = p->index;
 				p->dirty = 1;//设置父目录为脏，使得关闭系统时写回磁盘
 				p->disk_block.filesize += 1;
 				p->disk_block.block_index[i] = index;
@@ -129,6 +132,7 @@ int create(int inode_index, char* dirname) {
 				p->disk_block.filesize = 0;
 				p->disk_block.rw_mode = _cul_mode(0);//计算权限值，默认只有拥有者全部权限
 				strcpy(p->disk_block.uid, uid);//标记拥有者
+				p->disk_block.connect_num = 1;
 				flag = 1;
 			}
 			else {//无空闲i节点
@@ -183,8 +187,65 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除
 	return flag;
 }
 
-int share(int inode_index, int new_inode_index) {
+int share(int inode_index, int new_inode_index) {//第一个参数是要被链接的节点，后一个参数是目的节点，构造后->前
+	//先判断会不会构成回路，注：此处不允许出现被链接的是文件
+	int flag = 0;
+	int m = new_inode_index;
+	while (m != -1) {
+		if (m != inode_index) {
+			m = dir[m].front;
+			continue;//向前判断
+		}
+		else {
+			break;//判断到了
+		}
+	}
+	if (m == -1) {
+		//没有查询到，即没有闭环
+		struct inode *p, *t;
+		p = iget(new_inode_index);
+		t = iget(inode_index);
+		if (p->disk_block.filesize == MAX_FILE_NUM) { }//当前文件夹已经满了
+		else {
+			int i = 0, j = 0;
+			while (i < p->disk_block.filesize) {
+				if (p->disk_block.block_index[j] != MAX_INODE_NUM) {//即该位存在指向
+					if (strcmp(dir[p->disk_block.block_index[j]].name, dir[inode_index].name) == 0) {//判断重名
+						break;
+					}
+					else {
+						i += 1;//在存在指向时，计数值加一
+					}
+				}
+				j += 1;//用于全部的循环
+			}
+			if (i == p->disk_block.filesize) {//无重名
+				i = 0;
+				while (i < p->disk_block.filesize) {//寻找最小的空白区
+					if (p->disk_block.block_index[i] == MAX_INODE_NUM) {//此处利用了delete函数会置位，否则无法执行
+						break;
+					}
+					else {
+						i += 1;
+					}
+				}
+				p->disk_block.block_index[i] = inode_index;
+				p->disk_block.filesize += 1;
+				p->disk_block.file_type[i] = 3;//3表示快捷方式
+				p->dirty = 1;
+				t->disk_block.connect_num += 1;
+				t->dirty = 1;
 
+				flag = 1;
+			}
+		}
+		p = NULL;
+		t = NULL;
+	}
+	else {
+		flag = -1;
+	}
+	return flag;
 }
 
 int access(unsigned int allmode, int mode) {
@@ -214,3 +275,4 @@ int access(unsigned int allmode, int mode) {
 	}
 	return f;
 }
+
