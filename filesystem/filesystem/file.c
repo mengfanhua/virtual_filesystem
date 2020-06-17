@@ -8,7 +8,6 @@ struct superblock superblock;
 void close(int sysopen_index) {
 	//用户打开文件表在其他部分处理
 	sys_open[sysopen_index].count -= 1;
-	sys_open[sysopen_index].inode->disk_block.connect_num -= 1;
 	if (sys_open[sysopen_index].count == 0) {
 		sys_open[sysopen_index].inode = NULL;
 	}
@@ -55,7 +54,6 @@ char* open(int inode_index) {
 	}
 	if (j != MAX_SYSTEM_OPEN) {//即找到文件
 		sys_open[j].count += 1;
-		sys_open[j].inode->disk_block.connect_num += 1;//计数增加
 		s = _open(inode_index);
 
 	}
@@ -70,7 +68,6 @@ char* open(int inode_index) {
 		}
 		sys_open[j].count += 1;
 		sys_open[j].inode = iget(inode_index);//连接i节点
-		sys_open[j].inode->disk_block.connect_num += 1;
 		s = _open(inode_index);
 	}
 	else {
@@ -92,7 +89,7 @@ char * _split_char(char* content, int start, int size) {//简易字符串分割算法
 
 int save(int inode, char* content) {
 	int flag = 0;
-	int size = strlen(content);//strlen方法尾部会有\0，所以真实的字符串要-1
+	int size = strlen(content);
 	int block;
 	//能否占满整数个块
 	if (size%BLOCK_SIZE != 0) {
