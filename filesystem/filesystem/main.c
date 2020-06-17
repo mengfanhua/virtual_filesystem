@@ -2,8 +2,7 @@
 #include<string.h>
 
 int main() {
-	unsigned int a = 0x77777777;
-	printf("%d\n",a);
+	printf("%zd\n",sizeof(struct dir));
 	printf("%d", format());
 	getchar();
 }
