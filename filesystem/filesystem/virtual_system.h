@@ -52,8 +52,9 @@ struct superblock {
 
 struct dir {
 	//读取目录数据的结构
-	char name[14];
+	char name[12];
 	unsigned short index;
+	short front;
 };
 
 struct dinode {

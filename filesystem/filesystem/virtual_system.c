@@ -61,6 +61,7 @@ int format() {
 	//**********开始写数据区首块文件根目录名称**********
 	strcpy(dir[0].name, "root");
 	dir[0].index = 0;//注意：该处为目录区指向i节点区，用来指示下一个i节点的位置
+	dir[0].front = -1;
 	fseek(fp, DIR_START, SEEK_SET);
 	fwrite(&dir[0], 1, sizeof(struct dir), fp);
 	flag = 1;
