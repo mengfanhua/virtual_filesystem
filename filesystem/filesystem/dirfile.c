@@ -4,6 +4,7 @@
 struct superblock superblock;
 struct dir dir[MAX_DIR_NUM];
 char uid[6];
+struct system_open sys_open[MAX_SYSTEM_OPEN];
 
 unsigned int _cul_mode(int type) {//计算默认权限,0为文件，1为文件夹，二者默认权限不同
 	int i, j;
@@ -143,15 +144,32 @@ int create(int inode_index, char* dirname) {
 	p = NULL;
 	return flag;
 }
+int _open_system_sys(int inode_index) {
+	int flag = 0;
+	int i = 0, j = 0;
+	for (i = 0; i < MAX_SYSTEM_OPEN; i++) {
+		if (sys_open[i].count == 0) {
+			continue;
+		}
+		else if (sys_open[i].inode != inode_index) {
+			continue;
+		}
+		else {
+			flag = 1;
+			break;
+		}
+	}
 
-int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除
+}
+
+int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,后index为前index的序号
 	struct inode *p,*q;
 	int i = 0, j = 0;
 	int flag = 1;
 	p = iget(inode_index);
 	q = iget(dir[p->disk_block.block_index[index]].index);
 	if (p->disk_block.file_type[index] == 0) {//判断到要删除的是文件
-		if (q->disk_block.connect_num != 0 || access(q->disk_block.rw_mode, 3) == 0) {
+		if (_open_system_sys(q->index) != 0 || access(q->disk_block.rw_mode, 3) == 0) {
 			//   !=   文件没打开并且该用户有权限删除
 			flag = 0;
 		}
@@ -164,6 +182,10 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 		}
+	}
+	else if (p->disk_block.file_type[index] == 3) {//删除快捷方式
+		p->disk_block.filesize -= 1;
+		p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 	}
 	else {
 		while (i < q->disk_block.filesize) {
