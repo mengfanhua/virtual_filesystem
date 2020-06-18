@@ -1,8 +1,10 @@
 #include "interfaces.h"
+extern "C" {
 #include "virtual_system.h"
-
+}
 struct cur_path curpath;
 int new_index;
+struct dir_ dir[MAX_DIR_NUM];
 
 
 int _check_access(QString str) {
@@ -30,7 +32,7 @@ int _mkdir(QStringList& param) {
 	//将多级目录划分开
 	int i;
 	for (i = 0; i < path.size(); i++) {
-		if (path.at(i).size <= MAX_DIR_NAME_SIZE) {
+        if (path.at(i).size() <= MAX_DIR_NAME_SIZE) {
 			//文件夹名满足长度限制
 			continue;
 		}
@@ -64,14 +66,14 @@ int _mkdir(QStringList& param) {
 				}
 				m = new_index;//此处为mkdir函数成功时将创建的i节点的值保留为全局变量，以便此处调用
 			}
-			if (i == path.size) {//所有步骤均无错误
+            if (i == path.size()) {//所有步骤均无错误
 				flag = 1;
 			}
 		}
 	}
 	else {
 		//长度不满足限制
-		flag == -3;
+        flag = -3;
 	}
 	return flag;
 }
@@ -203,7 +205,7 @@ QString _dir() {
 
 int _create(QStringList& param) {
 	int flag = 0;
-	if (param.at(1).size > MAX_DIR_NAME_SIZE) {
+    if (param.at(1).size() > MAX_DIR_NAME_SIZE) {
 		//文件名超出限制
 		flag = -3;
 	}
@@ -225,7 +227,7 @@ int _del(QStringList& param, int x) {//删除文件或迭代删除文件夹
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
 		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
-			if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data) == 0) {
+            if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == x) {//判断类型是否正确
 					flag = del(curpath.front->inum, j);
 				}
@@ -260,7 +262,7 @@ int _open(QStringList& param) {
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
 		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
-			if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data) == 0) {
+            if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == 0) {//判断类型是否正确
 					flag = dir[p->disk_block.block_index[j]].index;
 				}
@@ -287,7 +289,7 @@ int _ls(QStringList& param) {
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
 		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
-			if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data) == 0) {
+            if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == 0) {//判断类型是否正确
 					flag = dir[p->disk_block.block_index[j]].index;
 				}
