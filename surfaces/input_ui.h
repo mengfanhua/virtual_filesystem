@@ -31,5 +31,6 @@ private slots:
 
 signals:
     void log(int i);
+	void fileopen(int i);
 };
 #endif // INPUT_UI_H
