@@ -25,7 +25,7 @@ void ifree(int inode_index) {
 		i -= 1;
 	}
 	superblock.dirty = 1;
-	superblock.free_inode[i] == 0;
+	superblock.free_inode[i] = 0;
 	superblock.free_inode_num += 1;
 }
 

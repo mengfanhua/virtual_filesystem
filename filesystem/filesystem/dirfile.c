@@ -151,7 +151,7 @@ int _open_system_sys(int inode_index) {
 		if (sys_open[i].count == 0) {
 			continue;
 		}
-		else if (sys_open[i].inode != inode_index) {
+		else if (sys_open[i].inode->index != inode_index) {
 			continue;
 		}
 		else {
@@ -159,7 +159,7 @@ int _open_system_sys(int inode_index) {
 			break;
 		}
 	}
-
+	return flag;
 }
 
 int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,后index为前index的序号
@@ -293,7 +293,7 @@ int access(unsigned int allmode, int mode) {
 	for (j = 0; j < i; j++) {
 		flag = flag / 16;//反向操作，使权限指示置于最低位
 	}
-	if (flag & mode == 0) {//判断对应位是否为1
+	if ((flag & mode) == 0) {//判断对应位是否为1
 		f = 0;
 	}
 	else {
