@@ -45,3 +45,9 @@
 /filesystem/filesystem/Release/filesystem.tlog
 /filesystem/filesystem/Release
 /filesystem/Release
+/surfaces/debug/moc_predefs.h
+/surfaces/release/qmake
+/surfaces/release
+/surfaces/debug/qmake
+/surfaces/debug
+/surfaces/.gitignore
