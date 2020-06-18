@@ -138,7 +138,7 @@ void bfree(int data_index);
 
 //**********文件夹及文件操作方法**********
 int mkdir(int inode_index, char* dirname);
-int chdir(int inode_index, int new_inode_index);
+int exist_dir(int inode_index, char *name);
 int create(int inode_index, char* dirname);
 int del(int inode_index, int index);
 int share(int inode_index, int new_inode_index);
