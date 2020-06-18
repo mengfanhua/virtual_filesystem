@@ -20,6 +20,7 @@ SOURCES += \
     dirfile.c \
     file.c \
     igetput.c \
+    interfaces.cpp \
     log.c \
     main.cpp \
     input_ui.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 
 HEADERS += \
     input_ui.h \
+    interfaces.h \
     virtual_system.h
 
 # Default rules for deployment.
