@@ -313,7 +313,9 @@ int exist_dir(int inode_index, char *name) {
 		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {
 			i += 1;
 			if (strcmp(dir[p->disk_block.block_index[j]].name, name) == 0) {
-				flag = dir[p->disk_block.block_index[j]].index;
+				if (p->disk_block.file_type[j] == 1) {//判断后继节点为文件夹，则该文件就一定为文件夹
+					flag = dir[p->disk_block.block_index[j]].index;
+				}
 				break;
 			}
 			else {
