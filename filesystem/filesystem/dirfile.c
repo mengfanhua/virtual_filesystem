@@ -303,7 +303,7 @@ int access(unsigned int allmode, int mode) {
 }
 
 int exist_dir(int inode_index, char *name) {
-	int flag = 0;
+	int flag = -1;
 	struct inode *p;
 	p = iget(inode_index);
 	int i = 0, j = 0;
@@ -311,7 +311,7 @@ int exist_dir(int inode_index, char *name) {
 		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {
 			i += 1;
 			if (strcmp(dir[p->disk_block.block_index[j]].name, name) == 0) {
-				flag = 1;
+				flag = dir[p->disk_block.block_index[j]].index;
 				break;
 			}
 			else {
