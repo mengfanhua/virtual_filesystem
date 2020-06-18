@@ -3,8 +3,6 @@
 #include <QStringList>
 #include <QString>
 #include <QLayoutItem>
-#include "virtual_system.h"
-#include <malloc.h>
 #include "interfaces.h"
 
 input_ui::input_ui(QWidget *parent)
