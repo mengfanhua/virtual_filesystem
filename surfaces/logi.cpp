@@ -34,6 +34,7 @@ logi::logi(QWidget *parent) : QWidget(parent)
 }
 
 logi::~logi(){
+
 }
 
 void logi::judge(){
