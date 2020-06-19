@@ -19,17 +19,21 @@ SOURCES += \
     allfree.c \
     dirfile.c \
     file.c \
+    file_open.cpp \
     igetput.c \
     interfaces.cpp \
     log.c \
+    logi.cpp \
     main.cpp \
     input_ui.cpp \
     rdwr.c \
     virtual_system.c
 
 HEADERS += \
+    file_open.h \
     input_ui.h \
     interfaces.h \
+    logi.h \
     virtual_system.h
 
 # Default rules for deployment.
