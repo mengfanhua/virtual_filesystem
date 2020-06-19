@@ -1,6 +1,10 @@
 #ifndef VIRTUAL_SYSTEM_H
 #define VIRTUAL_SYSTEM_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include<stdio.h>
 
 #define BLOCK_SIZE 512      //Ã¿¿é´óÐ¡
@@ -147,5 +151,10 @@ int access(unsigned int allmode, int mode);
 
 
 extern int new_index;
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // VIRTUAL_SYSTEM_H
