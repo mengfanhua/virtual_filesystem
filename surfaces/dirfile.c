@@ -148,7 +148,7 @@ int create(int inode_index, char* dirname) {
 }
 int _open_system_sys(int inode_index) {
 	int flag = 0;
-	int i = 0, j = 0;
+    int i = 0;
 	for (i = 0; i < MAX_SYSTEM_OPEN; i++) {
 		if (sys_open[i].count == 0) {
 			continue;
@@ -171,7 +171,7 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 	p = iget(inode_index);
 	q = iget(dir[p->disk_block.block_index[index]].index);
 	if (p->disk_block.file_type[index] == 0) {//判断到要删除的是文件
-		if (_open_system_sys(q->index) != 0 || access(q->disk_block.rw_mode, 3) == 0) {
+        if (_open_system_sys(q->index) != 0 || access(q->disk_block.rw_mode, 4) == 0) {
 			//   !=   文件没打开并且该用户有权限删除
 			flag = 0;
 		}
@@ -181,6 +181,7 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			}
 			ifree(q->index);//释放i节点
 			iput(q->index);//释放内存i节点
+            dir[q->index].front = -1;
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 			p->dirty = 1;
@@ -201,12 +202,13 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			}
 			j += 1;
 		}
-		if (access(q->disk_block.rw_mode, 3) == 0 || flag == 0) {//权限不足或文件夹内内容没有全部删除干净
+        if (access(q->disk_block.rw_mode, 4) == 0 || flag == 0) {//权限不足或文件夹内内容没有全部删除干净
 			flag = 0;
 		}
 		else {
 			ifree(q->index);//释放i节点
 			iput(q->index);//释放内存i节点
+            dir[q->index].front = -1;
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 			p->dirty = 1;
