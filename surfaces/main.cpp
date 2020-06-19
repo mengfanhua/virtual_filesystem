@@ -7,18 +7,16 @@
 
 int main(int argc, char *argv[])
 {
-    if(_init() == 0){
-        return 0;
-    }
+    _init();
     QApplication a(argc, argv);
     input_ui w;
     file_open e;
     logi p;
-    QObject::connect(&w,SIGNAL(fileopen(int)), &e, SLOT(openfile(int)));
-    QObject::connect(&e,SIGNAL(instruct()), &w, SLOT(back()));
-    QObject::connect(&p,SIGNAL(instr()), &w, SLOT(comein()));
-    QObject::connect(&p,SIGNAL(instr_s()), &w, SLOT(back()));
-    QObject::connect(&w,SIGNAL(log(int)), &p, SLOT(rec(int)));
+    QObject::connect(&w,SIGNAL(fileopen(int)), &e, SLOT(openfile(int)), Qt :: QueuedConnection);
+    QObject::connect(&e,SIGNAL(instruct()), &w, SLOT(back()), Qt :: QueuedConnection);
+    QObject::connect(&p,SIGNAL(instr()), &w, SLOT(comein()), Qt :: QueuedConnection);
+    QObject::connect(&p,SIGNAL(instr_s()), &w, SLOT(back()), Qt :: QueuedConnection);
+    QObject::connect(&w,SIGNAL(log(int)), &p, SLOT(rec(int)), Qt :: QueuedConnection);
     p.show();
     return a.exec();
 }
