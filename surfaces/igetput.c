@@ -32,6 +32,7 @@ struct inode* iget(int inode_index) {
 		}
 		p->dirty = 0;
 		p->index = inode_index;
+        p->next = NULL;
 	}
 	//如果存在节点直接返回就可
 	t = NULL;
@@ -58,7 +59,6 @@ void iput(int inode_index) {
 		}
 		if (t == NULL) {//p为hash链表上第一个节点
 			hash_head[m].next = p->next;//前后互连，将p排除在外
-			p->next->front = NULL;
 		}
 		else {//p不是链上第一个节点
 			t->next = p->next;
@@ -68,5 +68,6 @@ void iput(int inode_index) {
 		p->next = NULL;
 		free(p);
 	}
+    p = NULL;
 	t = NULL;
 }
