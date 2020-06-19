@@ -28,6 +28,8 @@ public:
 private slots:
     void solve_input();
     void slider();
+    void back();
+    void comein();
 
 signals:
     void log(int i);

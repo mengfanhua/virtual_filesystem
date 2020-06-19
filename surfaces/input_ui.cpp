@@ -55,20 +55,22 @@ void input_ui::solve_input(){//换行触发的槽函数
     }
     QString response = "";//用于显示结果
     if(param.size() == 0){ }//用户仅输入了回车或仅有空格
-    else if(param.at(0) == "login" && param.size() == 1){
-		//登录
-        emit log(0);
-    }
     else if(param.at(0) == "logout" && param.size() == 1){
 		//登出，会关闭所有该用户打开的文件
+        _logout();
+        this->hide();
         emit log(0);
     }
     else if(param.at(0) == "signup" && param.size() == 1){
 		//注册
+        this->hide();
+        response = "Done.\n\n";
         emit log(1);
     }
     else if(param.at(0) == "chuser" && param.size() == 1){
 		//切换账户，不会关闭当前用户打开的文件，以此实现同步共享
+        _exchange_admin();
+        this->hide();
         emit log(0);
     }
     else if(param.at(0) == "mkdir" && param.size() == 2){
@@ -125,7 +127,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		}
     }
     else if(param.at(0) == "open" && param.size() == 2){
-		int flag = _open(param);
+        int flag = _open_file(param);
 		if (flag == -1) {
 			response = "ERROR: Incorrect file type.\n\n";
 		}
@@ -163,6 +165,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		}
     }
     else if(param.at(0) == "exit" && param.size() == 1){
+        _exit_sys();
         this->close();
     }
     else if(param.at(0) == "cls" && param.size() == 1){
@@ -198,6 +201,8 @@ void input_ui::solve_input(){//换行触发的槽函数
         response = "ERROR: Unrecognized instructions.\n\n";
     }
     path = new QLabel;
+    QString s = get_cur_path();
+    path->setText(s);
     input->setEnabled(false);
     showResult = new QLabel;
     showResult->setEnabled(false);
@@ -214,4 +219,31 @@ void input_ui::solve_input(){//换行触发的槽函数
 
 void input_ui::slider(){
     bottom->verticalScrollBar()->setValue(bottom->verticalScrollBar()->maximum());
+}
+
+void input_ui::back(){
+    this->show();
+}
+
+void input_ui::comein(){
+    //登录槽函数
+    QLayoutItem *child;
+     while ((child = contentLayout->takeAt(0)) != 0){
+        if(child->widget()){
+            child->widget()->setParent(NULL);
+        }
+
+        delete child;
+     }
+     path = new QLabel;
+     QString s = get_cur_path();
+     path->setText(s);
+     input->setEnabled(false);
+     input = new QLineEdit;
+     input->setFixedWidth(650);
+     contentLayout->addWidget(path);
+     contentLayout->addWidget(input);
+     connect(input,SIGNAL(returnPressed()),this,SLOT(solve_input()));
+     input->setFocus();
+     this->show();
 }
