@@ -90,7 +90,7 @@ char * _split_char(char* content, int start, int size) {//简易字符串分割算法
 int save(int inode, char* content) {
 	int flag = 0;
 	int size = strlen(content);
-	int block;
+    int block;
 	//能否占满整数个块
 	if (size%BLOCK_SIZE != 0) {
 		block = (int)(size / BLOCK_SIZE) + 1;
