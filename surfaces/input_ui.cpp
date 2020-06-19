@@ -28,12 +28,8 @@ input_ui::input_ui(QWidget *parent)
     one->addWidget(bottom,0,0);//后面的参数是行，列
 
 	//此处的代码其实可以省略，然后在该界面被触发时，利用槽函数初始化
-    path = new QLabel;//用于显示当前路径
-    input = new QLineEdit;//用于输入命令
-    input->setFixedWidth(650);
-    contentLayout->addWidget(path);
-    contentLayout->addWidget(input);
-    connect(input,SIGNAL(returnPressed()),this,SLOT(solve_input()));//输入区按下回车触发槽函数
+    path = NULL;//用于显示当前路径
+    input = NULL;//用于输入命令
 	//滚动条自动向下槽函数
     connect(bottom->verticalScrollBar(), &QAbstractSlider::rangeChanged, this, &input_ui::slider);
     showResult = NULL;
@@ -65,6 +61,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		//注册
         this->hide();
         response = "Done.\n\n";
+        up(response);
         emit log(1);
     }
     else if(param.at(0) == "chuser" && param.size() == 1){
@@ -91,6 +88,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
     }
     else if(param.at(0) == "chdir" && param.size() == 2){
 		//切换路径，可多级目录，支持 ./   ../  .  ..  文件夹名/    文件夹
@@ -104,9 +102,11 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
     }
     else if(param.at(0) == "dir" && param.size() == 1){
 		response = _dir();
+        up(response);
     }
     else if(param.at(0) == "create" && param.size() == 2){
 		int flag = _create(param);
@@ -125,17 +125,21 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
     }
     else if(param.at(0) == "open" && param.size() == 2){
         int flag = _open_file(param);
 		if (flag == -1) {
 			response = "ERROR: Incorrect file type.\n\n";
+            up(response);
 		}
 		else if (flag == 0) {
 			response = "ERROR: File does not exist.\n\n";
+            up(response);
 		}
 		else {
 			response = "Done.\n\n";
+            up(response);
 			this->hide();
 			emit fileopen(flag);
 		}
@@ -151,6 +155,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
     }
     else if(param.at(0) == "rm" && param.size() == 2){
 		int flag = _rm(param);
@@ -163,6 +168,7 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
     }
     else if(param.at(0) == "exit" && param.size() == 1){
         _exit_sys();
@@ -178,6 +184,7 @@ void input_ui::solve_input(){//换行触发的槽函数
             delete child;
          }
 		 response = "Done.\n\n";
+         up(response);
     }
 	else if (param.at(0) == "ls" && param.size() == 3) {
 		int flag = _ls(param);
@@ -196,25 +203,12 @@ void input_ui::solve_input(){//换行触发的槽函数
 		else {
 			response = "Done.\n\n";
 		}
+        up(response);
 	}
     else{
         response = "ERROR: Unrecognized instructions.\n\n";
+        up(response);
     }
-    path = new QLabel;
-    QString s = get_cur_path();
-    path->setText(s);
-    input->setEnabled(false);
-    showResult = new QLabel;
-    showResult->setEnabled(false);
-    showResult->setText(response);
-    input = new QLineEdit;
-    input->setFixedWidth(650);
-    showResult->setFixedWidth(650);
-    contentLayout->addWidget(showResult);
-    contentLayout->addWidget(path);
-    contentLayout->addWidget(input);
-    connect(input,SIGNAL(returnPressed()),this,SLOT(solve_input()));
-    input->setFocus();
 }
 
 void input_ui::slider(){
@@ -238,7 +232,6 @@ void input_ui::comein(){
      path = new QLabel;
      QString s = get_cur_path();
      path->setText(s);
-     input->setEnabled(false);
      input = new QLineEdit;
      input->setFixedWidth(650);
      contentLayout->addWidget(path);
@@ -246,4 +239,21 @@ void input_ui::comein(){
      connect(input,SIGNAL(returnPressed()),this,SLOT(solve_input()));
      input->setFocus();
      this->show();
+}
+void input_ui::up(QString response){
+    path = new QLabel;
+    QString s = get_cur_path();
+    path->setText(s);
+    input->setEnabled(false);
+    showResult = new QLabel;
+    showResult->setEnabled(false);
+    showResult->setText(response);
+    input = new QLineEdit;
+    input->setFixedWidth(650);
+    showResult->setFixedWidth(650);
+    contentLayout->addWidget(showResult);
+    contentLayout->addWidget(path);
+    contentLayout->addWidget(input);
+    connect(input,SIGNAL(returnPressed()),this,SLOT(solve_input()));
+    input->setFocus();
 }

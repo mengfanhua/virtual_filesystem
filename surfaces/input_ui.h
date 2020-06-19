@@ -24,6 +24,7 @@ public:
     QLabel *path;
     QLineEdit *input;
     QLabel *showResult;
+    void up(QString response);
 
 private slots:
     void solve_input();
