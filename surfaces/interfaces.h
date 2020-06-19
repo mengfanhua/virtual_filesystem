@@ -9,7 +9,16 @@ QString _dir();
 int _create(QStringList& param);
 int _delete(QStringList& param);
 int _rm(QStringList& param);
-int _open(QStringList& param);
+int _open_file(QStringList& param);
 int _ls(QStringList& param);
+int _init();
+void _exit_sys();
+
+int _login(QString u,QString p);
+int _signup(QString u,QString p);
+void _logout();
+void _exchange_admin();
+
+QString get_cur_path();
 
 #endif // INTERFACES_H

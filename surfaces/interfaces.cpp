@@ -1,10 +1,9 @@
 #include "interfaces.h"
-extern "C" {
 #include "virtual_system.h"
-}
 struct cur_path curpath;
 int new_index;
 struct dir_ dir[MAX_DIR_NUM];
+char id[6];
 
 
 int _check_access(QString str) {
@@ -215,7 +214,9 @@ int _create(QStringList& param) {
 	}
 	else {
 		//调用后台create函数
-		flag = create(curpath.front->inum, param.at(1).toUtf8().data());
+        QByteArray s = param.at(1).toUtf8();
+        char *ss = s.data();
+        flag = create(curpath.front->inum, ss);
 	}
 	return flag;
 }
@@ -255,7 +256,7 @@ int _rm(QStringList& param) {
 	return _del(param, 1);
 }
 
-int _open(QStringList& param) {
+int _open_file(QStringList& param) {
 	int flag = 0;
 	int i = 0, j = 0;
 	struct inode *p;
@@ -354,4 +355,60 @@ int _ls(QStringList& param) {
 		}
 	}
 	return flag;
+}
+
+int _init(){
+    return init();
+}
+
+void _exit_sys(){
+    exit_sys();
+}
+
+void _clear_cur_path(){
+    //清除除根节点外所有的路径节点
+    struct cur_path *p;
+    p = curpath.front;
+    while(curpath.next != &curpath){
+        p->front->next = &curpath;
+        curpath.front = p->front;
+        p->front = NULL;
+        p->next = NULL;
+        free(p);
+        p = curpath.front;
+    }
+    p = NULL;
+}
+
+int _login(QString u,QString p){
+    int flag = login(u.toUtf8().data(),p.toUtf8().data());
+    if(flag == 1){
+        //登录后从根节点开始
+        _clear_cur_path();
+    }
+    return flag;
+}
+
+int _signup(QString u,QString p){
+    return signup(u.toUtf8().data(),p.toUtf8().data());
+}
+
+void _logout(){
+    logout();
+}
+void _exchange_admin(){
+    exchange_admin();
+}
+
+QString get_cur_path(){
+    QString s;
+    s = s + QString(QLatin1String(id))+" @ "+QString(QLatin1String(dir[curpath.inum].name));
+    struct cur_path *p;
+    p = curpath.next;
+    while(p!=&curpath){
+        s = s + "/" + QString(QLatin1String(dir[p->inum].name));
+        p=p->next;
+    }
+    s = s+ " $";
+    return s;
 }
