@@ -15,6 +15,7 @@ public:
 
     int inode_index;
     int dirty;
+    int success;
     QVBoxLayout *mainLayout;
     QWidget *top;
     QHBoxLayout * topLayout;
