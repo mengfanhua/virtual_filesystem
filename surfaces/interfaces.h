@@ -21,4 +21,9 @@ void _exchange_admin();
 
 QString get_cur_path();
 
+int get_rwmode(int i);
+char* _open_file_text(int a);
+void _close(int a);
+int _save(int a, QString content);
+
 #endif // INTERFACES_H

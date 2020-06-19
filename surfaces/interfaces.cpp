@@ -1,9 +1,6 @@
 #include "interfaces.h"
 #include "virtual_system.h"
-struct cur_path curpath;
-int new_index;
-struct dir_ dir[MAX_DIR_NUM];
-char id[6];
+
 
 
 int _check_access(QString str) {
@@ -401,6 +398,7 @@ void _exchange_admin(){
 }
 
 QString get_cur_path(){
+    //获取当前路径
     QString s;
     s = s + QString(QLatin1String(id))+" @ "+QString(QLatin1String(dir[curpath.inum].name));
     struct cur_path *p;
@@ -411,4 +409,109 @@ QString get_cur_path(){
     }
     s = s+ " $";
     return s;
+}
+
+int get_rwmode(int i){
+    struct inode *p;
+    int rw = 0;
+    //判定文件权限
+    p = iget(i);
+    if(access(p->disk_block.rw_mode,1)!=0){
+        rw = rw + 1;
+        if(access(p->disk_block.rw_mode,2)!=0){
+            rw = rw + 2;
+        }
+    }
+    return rw;
+}
+
+char* _open_file_text(int a){
+    char* s;
+    struct user_open *p;
+    p = uhead.next;
+    while(p!=NULL){
+        if(strcmp(p->uid, id)==0){
+            break;
+        }
+        else{
+            p=p->next;
+        }
+    }
+    if(p->opensize == MAX_USER_OPEN){
+        s = NULL;
+        return s;
+    }
+    int i=0,j=0;
+    while(i<p->opensize){
+        if(p->useropen[j]!=MAX_SYSTEM_OPEN){
+            if(sys_open[p->useropen[j]].inode->index == a){
+                break;
+            }
+            else{
+                i+=1;
+            }
+        }
+        j+=1;
+    }
+    char *k;
+    if(i == p->opensize){
+        k = open(a);
+        if(k==NULL){
+            return k;
+        }
+        i=0;
+        j=0;
+        while(i<p->opensize){
+            if(p->useropen[j]==MAX_SYSTEM_OPEN){
+                break;
+            }
+            else{
+                i+=1;
+            }
+            j+=1;
+        }
+        p->opensize+=1;
+        p->useropen[i]=new_index;
+        return k;
+    }
+    else{
+        k = _open(a);
+        return k;
+    }
+}
+
+void _close(int a){
+    struct user_open *p;
+    p = uhead.next;
+    while(p!=NULL){
+        if(strcmp(p->uid, id)==0){
+            break;
+        }
+        else{
+            p=p->next;
+        }
+    }
+    int i=0,j=0;
+    while(i<p->opensize){
+        if(p->useropen[j]!=MAX_SYSTEM_OPEN){
+            if(sys_open[p->useropen[j]].inode->index == a){
+                break;
+            }
+            else{
+                i+=1;
+            }
+        }
+        j+=1;
+    }
+    close(p->useropen[j]);
+    p->useropen[j] = MAX_SYSTEM_OPEN;
+    p->opensize-=1;
+}
+
+int _save(int a, QString content){
+    char *s;
+    QByteArray t = content.toLatin1();
+    s = t.data();
+    int flag = save(a, s);
+    return flag;
 }
