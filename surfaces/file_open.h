@@ -1,16 +1,39 @@
-#ifndef LOGI_H
-#define LOGI_H
+#ifndef FILE_OPEN_H
+#define FILE_OPEN_H
 
 #include <QWidget>
+#include <QLayout>
+#include <QPushButton>
+#include <QPlainTextEdit>
 
-class logi : public QWidget
+class file_open : public QWidget
 {
     Q_OBJECT
 public:
-    explicit logi(QWidget *parent = nullptr);
+    file_open(QWidget *parent = nullptr);
+    ~file_open();
+
+    int inode_index;
+    int dirty;
+    QVBoxLayout *mainLayout;
+    QWidget *top;
+    QHBoxLayout * topLayout;
+    QPushButton *smallButton;
+    QPushButton *saveButton;
+    QPushButton *closeButton;
+
+    QPlainTextEdit *textEdit;
+
+
+private slots:
+    void smallclick();
+    void saveclick();
+    void closeclick();
+    void openfile(int i);
+    void dirtyChange();
 
 signals:
-
+    void instruct();
 };
 
-#endif // LOGI_H
+#endif // FILE_OPEN_H
