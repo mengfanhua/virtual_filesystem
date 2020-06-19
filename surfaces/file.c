@@ -2,13 +2,12 @@
 #include<malloc.h>
 #include<string.h>
 
-struct system_open sys_open[MAX_SYSTEM_OPEN];
-struct superblock_ superblock;
 
 void close(int sysopen_index) {
 	//用户打开文件表在其他部分处理
 	sys_open[sysopen_index].count -= 1;
 	if (sys_open[sysopen_index].count == 0) {
+        iput(sys_open[sysopen_index].inode->index);
 		sys_open[sysopen_index].inode = NULL;
 	}
 }
@@ -46,6 +45,7 @@ char* open(int inode_index) {
 			flag = 1;//标志有空闲位置
 		}
 		else if (sys_open[j].inode->index == inode_index) {
+            new_index = j;
 			break;//找到对应打开文件
 		}
 		else {
@@ -67,6 +67,7 @@ char* open(int inode_index) {
 			}
 		}
 		sys_open[j].count += 1;
+        new_index = j;
 		sys_open[j].inode = iget(inode_index);//连接i节点
 		s = _open(inode_index);
 	}
@@ -100,6 +101,7 @@ int save(int inode, char* content) {
 	}
 	struct inode *p;
 	p = iget(inode);//获取对应i节点
+    p->dirty = 1;
 	if (block > MAX_FILE_NUM) {}//文件超出最大块限制
 	else if (p->disk_block.filesize < block) {
 		//当前已有文件块不足以存储修改后的字符串
@@ -121,7 +123,6 @@ int save(int inode, char* content) {
 					t = _split_char(content, i*BLOCK_SIZE, BLOCK_SIZE);
 				}
 				write(p->disk_block.block_index[i], t);
-				free(t);
 			}
 			t = NULL;
 			flag = 1;
@@ -144,7 +145,7 @@ int save(int inode, char* content) {
 				t = _split_char(content, i*BLOCK_SIZE, BLOCK_SIZE);
 			}
 			write(p->disk_block.block_index[i], t);
-			free(t);
+
 		}
 		t = NULL;
 		flag = 1;
@@ -160,7 +161,7 @@ int save(int inode, char* content) {
 				t = _split_char(content, i*BLOCK_SIZE, BLOCK_SIZE);
 			}
 			write(p->disk_block.block_index[i], t);
-			free(t);
+
 		}
 		t = NULL;
 		flag = 1;

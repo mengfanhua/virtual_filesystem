@@ -2,14 +2,6 @@
 #include <malloc.h>
 #include <string.h>
 
-FILE *fp = NULL;
-struct superblock_ superblock;
-struct dir_ dir[MAX_DIR_NUM];
-struct hinode hash_head[HASH_SIZE];
-struct system_open sys_open[MAX_SYSTEM_OPEN];
-struct user_head uhead;
-struct cur_path curpath;
-char id[6];
 
 int format() {
 	int flag = 0;
@@ -67,18 +59,22 @@ int format() {
 	fseek(fp, DIR_START, SEEK_SET);
 	fwrite(&dir[0], 1, sizeof(struct dir_), fp);
 	flag = 1;
+    fclose(fp);
 	return flag;
 }
 
 int init() {
 	int flag = 0;
-	fp = fopen("filesystem", "rb+");
+    fp = fopen("filesystem", "rb+");
 	if (fp == NULL) {
 		//文件系统不存在
 		if (format() == 0) {
 			//格式化失败
 			return flag;
 		}
+        else{
+            return init();
+        }
 	}
 	else {
 		//**********读取超级块**********
@@ -138,6 +134,8 @@ void exit_sys() {
 		fseek(fp, DIR_START + DIR_SIZE*j, SEEK_SET);
 		fwrite(&dir[j], 1, sizeof(struct dir_), fp);
 	}
+
 	p = NULL;
 	t = NULL;
+    fclose(fp);
 }

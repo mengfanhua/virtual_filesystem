@@ -2,7 +2,7 @@
 #include<malloc.h>
 #include<string.h>
 
-FILE *fp;
+
 
 char* read(int dnode_index) {
 	//读出一块数据区
@@ -20,6 +20,8 @@ void write(int dnode_index, char* content) {
 		fwrite(content, 1, BLOCK_SIZE, fp);
 	}
 	else {
-		fwrite(content, 1, strlen(content), fp);
+        fwrite(content, 1, strlen(content), fp);
+        char a = '\0';
+        fwrite(&a, 1, 1, fp);
 	}
 }

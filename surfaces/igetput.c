@@ -1,8 +1,6 @@
 #include "virtual_system.h"
 #include<malloc.h>
 #include<string.h>
-struct hinode hash_head[HASH_SIZE];
-FILE *fp;
 
 struct inode* iget(int inode_index) {
 	int m = inode_index % HASH_SIZE;//计算hash值
@@ -59,10 +57,15 @@ void iput(int inode_index) {
 		}
 		if (t == NULL) {//p为hash链表上第一个节点
 			hash_head[m].next = p->next;//前后互连，将p排除在外
+            if(p->next!=NULL){
+                p->next->front = NULL;
+            }
 		}
 		else {//p不是链上第一个节点
 			t->next = p->next;
-			p->next->front = t;
+            if(p->next!=NULL){
+                p->next->front = t;
+            }
 		}
 		p->front = NULL;//清除指针的指向
 		p->next = NULL;

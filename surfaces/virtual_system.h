@@ -9,7 +9,7 @@ extern "C"{
 
 #define BLOCK_SIZE 512      //每块大小
 #define SUPER_BLOCK 8       //超级块区所占块个数
-#define INODE_BLOCK 32      //i节点区所占块数，第一块为主引导部分，不包括在i节点部分
+#define INODE_BLOCK 32      //i节点区所占块数，第一块为主引导部分
 #define INODE_SIZE 64       //每个i节点的大小，经过测试，正好为64字节，无浪费
 #define FILE_BLOCK 512      //数据区所占块数
 #define MAX_INODE_NUM 256   //计算得出i节点的最大个数
@@ -24,9 +24,9 @@ extern "C"{
 
 //此处定义了各部分在文件系统中的基础偏移，inode特殊在留出一个位置给了主引导部分，超级块前留出了引导区
 #define SUPER_START BLOCK_SIZE
-#define INODE_START SUPER_BLOCK * BLOCK_SIZE
-#define DIR_START (SUPER_BLOCK + INODE_BLOCK) * BLOCK_SIZE
-#define DATA_START (SUPER_BLOCK + INODE_BLOCK + DIR_BLOCK) * BLOCK_SIZE
+#define INODE_START (SUPER_BLOCK+1) * BLOCK_SIZE
+#define DIR_START (SUPER_BLOCK + INODE_BLOCK+1) * BLOCK_SIZE
+#define DATA_START (SUPER_BLOCK + INODE_BLOCK + DIR_BLOCK+1) * BLOCK_SIZE
 
 #define MAX_SYSTEM_OPEN 40   //系统打开表最大值
 #define MAX_USER_OPEN 10     //用户打开表最大值
@@ -91,12 +91,12 @@ struct system_open {
 int format();
 int init();
 void exit_sys();
-extern FILE *fp;
-extern struct superblock_ superblock;
-extern struct dir_ dir[MAX_DIR_NUM];
-extern struct hinode hash_head[HASH_SIZE];
-extern struct system_open sys_open[MAX_SYSTEM_OPEN];
-extern char uid[6];//用来登陆后记录当前用户的uid的
+FILE *fp;
+struct superblock_ superblock;
+struct dir_ dir[MAX_DIR_NUM];
+struct hinode hash_head[HASH_SIZE];
+struct system_open sys_open[MAX_SYSTEM_OPEN];
+char uid[6];//用来登陆后记录当前用户的uid的
 
 //**********log**********
 struct user_open {
@@ -116,9 +116,9 @@ struct user_head {
 	unsigned short num;
 	struct user_open *next;
 };
-extern struct user_head uhead;
-extern struct cur_path curpath;
-extern char id[6];
+struct user_head uhead;
+struct cur_path curpath;
+char id[6];
 
 int login(char* uid, char* passwd);//登录
 void logout();//登出，会关闭已打开得出文件
@@ -150,8 +150,7 @@ int share(int inode_index, int new_inode_index);
 int access(unsigned int allmode, int mode);
 
 
-extern int new_index;
-
+int new_index;
 
 #ifdef __cplusplus
 }

@@ -1,11 +1,6 @@
 #include "virtual_system.h"
 #include<string.h>
 
-struct superblock_ superblock;
-struct dir_ dir[MAX_DIR_NUM];
-char uid[6];
-struct system_open sys_open[MAX_SYSTEM_OPEN];
-int new_index;
 
 unsigned int _cul_mode(int type) {//计算默认权限,0为文件，1为文件夹，二者默认权限不同
 	int i, j;
@@ -179,9 +174,9 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			for (i = 0; i < q->disk_block.filesize; i++) {
 				bfree(q->disk_block.block_index[i]);//释放数据区
 			}
+            dir[q->index].front = -1;
 			ifree(q->index);//释放i节点
 			iput(q->index);//释放内存i节点
-            dir[q->index].front = -1;
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 			p->dirty = 1;
@@ -206,9 +201,9 @@ int del(int inode_index, int index) {//删除文件夹迭代删除，如果权限不足则不删除,
 			flag = 0;
 		}
 		else {
+            dir[q->index].front = -1;
 			ifree(q->index);//释放i节点
 			iput(q->index);//释放内存i节点
-            dir[q->index].front = -1;
 			p->disk_block.filesize -= 1;
 			p->disk_block.block_index[index] = MAX_INODE_NUM;//对空白区进行置位
 			p->dirty = 1;
