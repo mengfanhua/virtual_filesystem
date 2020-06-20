@@ -3,6 +3,7 @@
 
 logi::logi(QWidget *parent) : QWidget(parent)
 {
+    this->setAttribute(Qt::WA_DeleteOnClose);
     sig = 0;
     user = new QLineEdit;
     password = new QLineEdit;
@@ -34,7 +35,23 @@ logi::logi(QWidget *parent) : QWidget(parent)
 }
 
 logi::~logi(){
-
+	
+    delete user;
+    delete password;
+    delete confirm;
+    delete exit_s;
+    delete error;
+    delete buttonLayout;
+    delete bottomWidget;
+    delete mainLayout;
+    user=NULL;
+    password=NULL;
+    confirm=NULL;
+    exit_s=NULL;
+    mainLayout=NULL;
+    buttonLayout=NULL;
+    bottomWidget=NULL;
+    error=NULL;
 }
 
 void logi::judge(){
@@ -84,8 +101,9 @@ void logi::judge(){
 
 void logi::closeornot(){
     if(sig==0){
+        _clear_cur_path();
         _exit_sys();
-        this->close();
+        this->deleteLater();
     }
     else{
         error->setVisible(false);
