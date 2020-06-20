@@ -182,7 +182,7 @@ QString _dir() {
 	p = iget(curpath.front->inum);//获取当前节点
 	int i = 0, j = 0, k;
 	while (i < p->disk_block.filesize) {
-		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
+		if (p->disk_block.block_index[j] != MAX_INODE_NUM) {//非占位数，删除引起的
 			QString te = QString(QLatin1String(dir[p->disk_block.block_index[j]].name));//char * 转QString
 			for (k = te.size(); k < 13; k++) {
 				te = te + " ";//格式化
@@ -190,9 +190,9 @@ QString _dir() {
 			temp = temp + te;//连接前半部分
 			switch (p->disk_block.file_type[j]) {
 				//判断文件格式，文件，文件夹，快捷方式
-			case 0:temp = temp + type1 + "\n"; break;
-			case 1:temp = temp + type2 + "\n"; break;
-			case 3:temp = temp + type3 + "\n"; break;
+			case 0: {temp = temp + type1 + "\n"; break; }
+			case 1: {temp = temp + type2 + "\n"; break; }
+			case 3: {temp = temp + type3 + "\n"; break; }
 			default:break;
 			}
 			i += 1;
@@ -229,13 +229,15 @@ int _del(QStringList& param, int x) {//删除文件或迭代删除文件夹
 	struct inode *p;
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
-		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
+		if (p->disk_block.block_index[j] != MAX_INODE_NUM) {//非占位数，删除引起的
             if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == x) {//判断类型是否正确
 					flag = del(curpath.front->inum, j);
+					break;
 				}
 				else if (x == 0 && p->disk_block.file_type[j] == 3) {//文件特殊处理，因为有快捷方式
 					flag = del(curpath.front->inum, j);
+					break;
 				}
 				else {
 					flag = -1;//类型判断错误
@@ -264,7 +266,7 @@ int _open_file(QStringList& param) {
 	struct inode *p;
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
-		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
+		if (p->disk_block.block_index[j] != MAX_INODE_NUM) {//非占位数，删除引起的
             if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == 0) {//判断类型是否正确
 					flag = dir[p->disk_block.block_index[j]].index;
@@ -291,7 +293,7 @@ int _ls(QStringList& param) {
 	struct inode *p;
 	p = iget(curpath.front->inum);
 	while (i < p->disk_block.filesize) {
-		if (p->disk_block.block_index[j] != MAX_FILE_NUM) {//非占位数，删除引起的
+		if (p->disk_block.block_index[j] != MAX_INODE_NUM) {//非占位数，删除引起的
             if (strcmp(dir[p->disk_block.block_index[j]].name, param.at(1).toUtf8().data()) == 0) {
 				if (p->disk_block.file_type[j] == 0) {//判断类型是否正确
 					flag = dir[p->disk_block.block_index[j]].index;
