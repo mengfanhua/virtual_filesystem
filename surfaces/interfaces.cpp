@@ -1,7 +1,12 @@
 #include "interfaces.h"
 #include "virtual_system.h"
 
-
+struct dir_ dir[MAX_DIR_NUM];
+struct system_open sys_open[MAX_SYSTEM_OPEN];
+int new_index;
+struct user_head uhead;
+struct cur_path curpath;
+char id[6];
 
 int _check_access(QString str) {
 	//检测文件夹名或文件名是否符合要求

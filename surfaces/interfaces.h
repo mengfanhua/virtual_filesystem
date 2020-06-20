@@ -26,4 +26,6 @@ char* _open_file_text(int a);
 void _close(int a);
 int _save(int a, QString content);
 
+void _clear_cur_path();
+
 #endif // INTERFACES_H
