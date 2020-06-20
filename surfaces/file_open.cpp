@@ -1,10 +1,9 @@
 #include "file_open.h"
 #include "interfaces.h"
-#include <QMessageBox>
-#include <QDialog>
 
 file_open::file_open(QWidget *parent) : QWidget(parent)
 {
+    this->setFixedSize(650,300);
     inode_index = 0;
     dirty = 0;
     success = 0;
@@ -14,7 +13,7 @@ file_open::file_open(QWidget *parent) : QWidget(parent)
     smallButton = new QPushButton;
     saveButton = new QPushButton;
     closeButton = new QPushButton;
-    textEdit = new QPlainTextEdit;
+    textEdit = new QTextEdit;
     this->setLayout(mainLayout);
     mainLayout->addWidget(top);
     mainLayout->addWidget(textEdit);
@@ -25,84 +24,103 @@ file_open::file_open(QWidget *parent) : QWidget(parent)
     smallButton->setText("smallest");
     saveButton->setText("save");
     closeButton->setText("close");
-    this->setFixedSize(300,300);
-    this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     connect(smallButton, SIGNAL(clicked()), this, SLOT(smallclick()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveclick()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeclick()));
     connect(textEdit, SIGNAL(textChanged()),this, SLOT(dirtyChange()));
-    textEdit->setPlainText("");
+    r = new QString;
+    *r = "";
+    textEdit->setText(*r);
+    message = new QMessageBox;
 }
 
 file_open::~file_open(){
+    delete r;
+    delete message;
+    delete textEdit;
+    delete closeButton;
+    delete smallButton;
+    delete saveButton;
+    delete topLayout;
+    delete top;
+    delete mainLayout;
+    mainLayout=NULL;
+    top=NULL;
+    topLayout=NULL;
+    smallButton=NULL;
+    saveButton=NULL;
+    closeButton=NULL;
+
+    textEdit=NULL;
+    message=NULL;
+    r=NULL;
 }
 
 void file_open::smallclick(){
     if(dirty==1){
-        if(QMessageBox::Yes == QMessageBox::question(this,"EXIT","Save your change?",
+        if(QMessageBox::Yes == message->question(this,"EXIT","Save your change?",
                                                      QMessageBox::Yes | QMessageBox:: No)){
-            QString z = textEdit->toPlainText();
-            int flag = _save(inode_index, z);
+            *r = textEdit->toPlainText();
+            int flag = _save(inode_index, *r);
             if(flag == 1){
-                this->hide();
-                emit instruct();
+                this->setEnabled(false);
+                emit instruct("Done.\n\n");
             }
             else{
-                QMessageBox::information(NULL,"FAIL","ERROR to save.",true);
+                message->information(this,"FAIL","ERROR to save.",true);
             }
         }
         else{
-            this->hide();
-            emit instruct();
+            this->setEnabled(false);
+            emit instruct("Done.\n\n");
         }
     }
-    this->hide();
-    emit instruct();
+    this->setEnabled(false);
+    emit instruct("Done.\n\n");
 }
 void file_open::saveclick(){
-    QString z = textEdit->toPlainText();
-    int flag = _save(inode_index, z);
+    *r = textEdit->toPlainText();
+    int flag = _save(inode_index, *r);
     if(flag == 1){
-        QMessageBox::information(NULL,"OK","Successful.",true);
+        message->information(this,"OK","Successful.",true);
         dirty = 0;
         saveButton->setEnabled(false);
     }
     else{
-        QMessageBox::information(NULL,"FAIL","ERROR to save.",true);
+        message->information(this,"FAIL","ERROR to save.",true);
     }
 }
 void file_open::closeclick(){
     if(success != 0 && dirty == 0){
         _close(inode_index);
-        this->hide();
-        emit instruct();
+        this->setEnabled(false);
+        emit instruct("Done.\n\n");
     }
     else{
         if(dirty==1){
-            if(QMessageBox::Yes == QMessageBox::question(this,"EXIT","Save your change?",
+            if(QMessageBox::Yes == message->question(this,"EXIT","Save your change?",
                                                          QMessageBox::Yes | QMessageBox:: No)) {
-                QString z = textEdit->toPlainText();
-                int flag = _save(inode_index, z);
+                *r = textEdit->toPlainText();
+                int flag = _save(inode_index, *r);
                 if(flag == 1){
                     _close(inode_index);
-                    this->hide();
-                    emit instruct();
+                    this->setEnabled(false);
+                    emit instruct("Done.\n\n");
                 }
                 else{
-                    QMessageBox::information(NULL,"FAIL","ERROR to save.",true);
+                    message->information(this,"FAIL","ERROR to save.",true);
                 }
             }
             else{
                 _close(inode_index);
-                this->hide();
-                emit instruct();
+                this->setEnabled(false);
+                emit instruct("Done.\n\n");
             }
         }
     }
 }
 
 void file_open::openfile(int i){
-    this->show();
     this->inode_index = i;
     int rw = get_rwmode(i);
     if(rw/2 != 0){
@@ -126,8 +144,8 @@ void file_open::openfile(int i){
         }
         else{
             success = 1;
-            QString r = QString(QLatin1String(s));
-            textEdit->setPlainText(r);
+            *r = QString(QLatin1String(s));
+            textEdit->setPlainText(*r);
             smallButton->setEnabled(true);
         }
     }

@@ -4,7 +4,8 @@
 #include <QWidget>
 #include <QLayout>
 #include <QPushButton>
-#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QMessageBox>
 
 class file_open : public QWidget
 {
@@ -18,23 +19,23 @@ public:
     int success;
     QVBoxLayout *mainLayout;
     QWidget *top;
-    QHBoxLayout * topLayout;
+    QHBoxLayout *topLayout;
     QPushButton *smallButton;
     QPushButton *saveButton;
     QPushButton *closeButton;
 
-    QPlainTextEdit *textEdit;
-
-
+    QTextEdit *textEdit;
+    QMessageBox *message;
+    QString *r;
+    void openfile(int i);
 private slots:
     void smallclick();
     void saveclick();
     void closeclick();
-    void openfile(int i);
     void dirtyChange();
 
 signals:
-    void instruct();
+    void instruct(QString s);
 };
 
 #endif // FILE_OPEN_H
