@@ -8,6 +8,7 @@
 input_ui::input_ui(QWidget *parent)
     : QWidget(parent)
 {
+    this->setAttribute(Qt::WA_DeleteOnClose);
 	//禁用关闭键，使得可以自己设置关闭方法
     this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     this->setFixedSize(700, 700);
@@ -33,10 +34,34 @@ input_ui::input_ui(QWidget *parent)
 	//滚动条自动向下槽函数
     connect(bottom->verticalScrollBar(), &QAbstractSlider::rangeChanged, this, &input_ui::slider);
     showResult = NULL;
+    file = NULL;
 }
 
 input_ui::~input_ui()
-{
+{/*
+    QLayoutItem *child;
+     while ((child = contentLayout->takeAt(0)) != 0){
+        if(child->widget()){
+            child->widget()->setParent(NULL);
+        }
+
+        delete child;
+     }
+    delete contentLayout;
+    delete bottomContent;
+    delete bottom;
+    delete one;
+    one=NULL;
+
+    bottom=NULL;
+    bottomContent=NULL;
+    contentLayout=NULL;
+
+    path=NULL;
+    input=NULL;
+    showResult=NULL;
+    file=NULL;
+	*/
 }
 
 void input_ui::solve_input(){//换行触发的槽函数
@@ -138,10 +163,11 @@ void input_ui::solve_input(){//换行触发的槽函数
             up(response);
 		}
 		else {
-			response = "Done.\n\n";
-            up(response);
-			this->hide();
-			emit fileopen(flag);
+            input->setEnabled(false);
+            file = new file_open;
+            file->openfile(flag);
+            connect(file, SIGNAL(instruct(QString)),this,SLOT(up(QString)));
+            contentLayout->addWidget(file);
 		}
     }
     else if(param.at(0) == "delete" && param.size() == 2){
@@ -171,6 +197,7 @@ void input_ui::solve_input(){//换行触发的槽函数
         up(response);
     }
     else if(param.at(0) == "exit" && param.size() == 1){
+        _clear_cur_path();
         _exit_sys();
         this->close();
     }

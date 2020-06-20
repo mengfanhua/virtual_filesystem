@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
+#include "file_open.h"
 
 class input_ui : public QWidget
 {
@@ -24,13 +25,14 @@ public:
     QLabel *path;
     QLineEdit *input;
     QLabel *showResult;
-    void up(QString response);
+    file_open *file;
 
 private slots:
     void solve_input();
     void slider();
     void back();
     void comein();
+    void up(QString response);
 
 signals:
     void log(int i);
