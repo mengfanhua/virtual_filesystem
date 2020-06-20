@@ -1,11 +1,17 @@
 #include "virtual_system.h"
 #include<string.h>
 
+struct superblock_ superblock;
+struct dir_ dir[MAX_DIR_NUM];
+struct system_open sys_open[MAX_SYSTEM_OPEN];
+int new_index;
+char id[6];
+
 
 unsigned int _cul_mode(int type) {//计算默认权限,0为文件，1为文件夹，二者默认权限不同
 	int i, j;
 	for (i = 0; i < superblock.usernum; i++) {
-		if (strcmp(superblock.uid[i], uid) == 0) {//找到当前用户的索引id
+        if (strcmp(superblock.uid[i], id) == 0) {//找到当前用户的索引id
 			break;
 		}
 		else {
@@ -71,7 +77,7 @@ int mkdir(int inode_index, char* dirname) {//创建文件夹
 				//初始化新的i节点
 				p->disk_block.filesize = 0;
 				p->disk_block.rw_mode = _cul_mode(1);//计算权限值，默认只有拥有者全部权限
-				strcpy(p->disk_block.uid, uid);//标记拥有者
+                strcpy(p->disk_block.uid, id);//标记拥有者
 				p->disk_block.connect_num = 1;
 				flag = 1;
 				new_index = index;
@@ -129,7 +135,7 @@ int create(int inode_index, char* dirname) {
 							 //初始化新的i节点
 				p->disk_block.filesize = 0;
 				p->disk_block.rw_mode = _cul_mode(0);//计算权限值，默认只有拥有者全部权限
-				strcpy(p->disk_block.uid, uid);//标记拥有者
+                strcpy(p->disk_block.uid, id);//标记拥有者
 				p->disk_block.connect_num = 1;
 				flag = 1;
 			}
@@ -277,7 +283,7 @@ int access(unsigned int allmode, int mode) {
 	int i, j, f;
 	unsigned int flag;
 	for (i = 0; i < superblock.usernum; i++) {
-		if (strcmp(superblock.uid[i], uid) == 0) {//找到当前用户的索引id
+        if (strcmp(superblock.uid[i], id) == 0) {//找到当前用户的索引id
 			break;
 		}
 		else {

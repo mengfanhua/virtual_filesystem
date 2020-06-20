@@ -2,6 +2,9 @@
 #include<malloc.h>
 #include<string.h>
 
+struct superblock_ superblock;
+struct system_open sys_open[MAX_SYSTEM_OPEN];
+int new_index;
 
 void close(int sysopen_index) {
 	//用户打开文件表在其他部分处理
@@ -17,7 +20,7 @@ char* _open(int inode_index) {
 	struct inode *p;
 	p = iget(inode_index);
 	char *t, *r;
-	t = (char *)malloc(sizeof(char)*p->disk_block.filesize);
+    t = (char *)malloc(sizeof(char)*p->disk_block.filesize*BLOCK_SIZE);
 	t[0] = '\0';
 	int i;
 	for (i = 0; i < p->disk_block.filesize; i++) {

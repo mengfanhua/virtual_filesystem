@@ -1,6 +1,6 @@
 #include "virtual_system.h"
 
-
+struct superblock_ superblock;
 
 int ialloc() {
 	int i = MAX_INODE_NUM - 1, flag = -1;

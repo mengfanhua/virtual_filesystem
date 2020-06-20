@@ -2,6 +2,9 @@
 #include<malloc.h>
 #include<string.h>
 
+FILE *fp;
+struct hinode hash_head[HASH_SIZE];
+
 struct inode* iget(int inode_index) {
 	int m = inode_index % HASH_SIZE;//计算hash值
 	struct inode *p, *t = NULL;//t用来记录p的前一节点

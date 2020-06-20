@@ -2,7 +2,7 @@
 #include<malloc.h>
 #include<string.h>
 
-
+FILE *fp;
 
 char* read(int dnode_index) {
 	//读出一块数据区

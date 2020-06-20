@@ -2,6 +2,9 @@
 #include<string.h>
 #include<malloc.h>
 
+struct superblock_ superblock;
+struct user_head uhead;
+char id[6];
 
 struct user_open* _create_user(char* uid) {//内部创建函数，创建一个已登录账户的链表项
 	struct user_open *p;

@@ -91,12 +91,12 @@ struct system_open {
 int format();
 int init();
 void exit_sys();
-FILE *fp;
-struct superblock_ superblock;
-struct dir_ dir[MAX_DIR_NUM];
-struct hinode hash_head[HASH_SIZE];
-struct system_open sys_open[MAX_SYSTEM_OPEN];
-char uid[6];//用来登陆后记录当前用户的uid的
+extern FILE *fp;
+extern struct superblock_ superblock;
+extern struct dir_ dir[MAX_DIR_NUM];
+extern struct hinode hash_head[HASH_SIZE];
+extern struct system_open sys_open[MAX_SYSTEM_OPEN];
+extern char id[6];//用来登陆后记录当前用户的uid的
 
 //**********log**********
 struct user_open {
@@ -116,9 +116,8 @@ struct user_head {
 	unsigned short num;
 	struct user_open *next;
 };
-struct user_head uhead;
-struct cur_path curpath;
-char id[6];
+extern struct user_head uhead;
+extern struct cur_path curpath;
 
 int login(char* uid, char* passwd);//登录
 void logout();//登出，会关闭已打开得出文件
@@ -150,7 +149,7 @@ int share(int inode_index, int new_inode_index);
 int access(unsigned int allmode, int mode);
 
 
-int new_index;
+extern int new_index;
 
 #ifdef __cplusplus
 }
